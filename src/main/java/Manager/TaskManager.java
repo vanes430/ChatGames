@@ -23,6 +23,9 @@ public class TaskManager {
    }
 
    public ScheduledTask timeExpiredTask() {
+      if (this.timeExpiredTask != null) {
+         this.timeExpiredTask.cancel();
+      }
       this.timeExpiredTask = Bukkit.getGlobalRegionScheduler().runDelayed(this.plugin, (task) -> {
          if (this.plugin.inGame && this.plugin.selected != null) {
             this.plugin.inGame = false;
