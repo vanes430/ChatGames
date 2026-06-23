@@ -25,6 +25,22 @@ public class GameManager {
       this.plugin = instance;
    }
 
+   private Sound getSoundSafely() {
+      String soundName = this.plugin.getConfig().getString("sound");
+      if (soundName == null || soundName.isEmpty()) {
+         return Sound.ENTITY_PLAYER_LEVELUP;
+      }
+      if (soundName.equalsIgnoreCase("LEVEL_UP")) {
+         return Sound.ENTITY_PLAYER_LEVELUP;
+      }
+      try {
+         return Sound.valueOf(soundName.toUpperCase());
+      } catch (IllegalArgumentException e) {
+         this.plugin.getLogger().warning("Invalid sound name in config: " + soundName + ". Defaulting to ENTITY_PLAYER_LEVELUP.");
+         return Sound.ENTITY_PLAYER_LEVELUP;
+      }
+   }
+
    public String Color(String message) {
       return this.plugin.Color(message);
    }
@@ -533,7 +549,7 @@ public class GameManager {
       for (Player player : Bukkit.getOnlinePlayers()) {
          if (this.worldEnabled(player) && this.gamesIsToggled(player)) {
             if (this.plugin.getConfig().getBoolean("playSound")) {
-               player.getWorld().playSound(player.getLocation(), Sound.valueOf(this.plugin.getConfig().getString("sound")), 1.0F, 1.0F);
+               player.getWorld().playSound(player.getLocation(), this.getSoundSafely(), 1.0F, 1.0F);
             }
 
             this.sendListMessage(
@@ -645,7 +661,7 @@ public class GameManager {
          for (Player player : Bukkit.getOnlinePlayers()) {
             if (this.worldEnabled(player) && this.gamesIsToggled(player)) {
                if (this.plugin.getConfig().getBoolean("playSound")) {
-                  player.getWorld().playSound(player.getLocation(), Sound.valueOf(this.plugin.getConfig().getString("sound")), 1.0F, 1.0F);
+                  player.getWorld().playSound(player.getLocation(), this.getSoundSafely(), 1.0F, 1.0F);
                }
 
                this.sendVariableGameMessage(
