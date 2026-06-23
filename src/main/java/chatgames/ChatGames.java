@@ -159,7 +159,7 @@ public class ChatGames extends JavaPlugin implements Listener {
             .filter(path -> path != null)
             .forEachOrdered(path -> this.points.put(path, this.configManager.pointsdata.getInt("Points." + path + ".amount")));
          this.getLogger().info("Points loaded successfully!");
-      } catch (NullPointerException var2) {
+      } catch (NullPointerException e) {
          this.getLogger().info("No points info was found! If this is your first time enabling the plugin, it is normal.");
       }
    }
@@ -170,6 +170,10 @@ public class ChatGames extends JavaPlugin implements Listener {
       this.unreverseWords.clear();
       this.trivias.clear();
       this.games.clear();
+      File configFile = new File(this.getDataFolder(), "config.yml");
+      if (!configFile.exists()) {
+         this.saveDefaultConfig();
+      }
       this.reloadConfig();
       this.configManager.reload();
       this.loadGames();

@@ -109,7 +109,7 @@ public class GameManager {
          }
 
          this.sendConfigMessage(sender, messages.getString("top.footer"));
-      } catch (NullPointerException var6) {
+      } catch (NullPointerException e) {
          sender.sendMessage(this.Color(messages.getString("top.no_data_message")));
       }
    }

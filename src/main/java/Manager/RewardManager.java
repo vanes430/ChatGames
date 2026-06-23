@@ -87,7 +87,7 @@ public class RewardManager extends RandomReward {
                         String[] split = command.split("%~ ");
                         double parsedChance = Double.parseDouble(split[0]);
                         this.add(parsedChance, split[1]);
-                     } catch (NumberFormatException var18) {
+                     } catch (NumberFormatException e) {
                         this.plugin.getLogger().log(Level.SEVERE, "Error while trying to parse chance for game {0} in command line:", game.toUpperCase());
                         this.plugin.getLogger().log(Level.SEVERE, "- {0}", command);
                      }
