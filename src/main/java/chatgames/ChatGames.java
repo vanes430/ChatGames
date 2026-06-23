@@ -69,6 +69,13 @@ public class ChatGames extends JavaPlugin implements Listener {
    }
 
    public void onDisable() {
+      if (this.mainTask != null) {
+         this.mainTask.cancel();
+      }
+      if (this.taskManager != null && this.taskManager.timeExpiredTask != null) {
+         this.taskManager.timeExpiredTask.cancel();
+      }
+      instance = null;
       this.getLogger().info("ChatGames is now disabled!");
    }
 
