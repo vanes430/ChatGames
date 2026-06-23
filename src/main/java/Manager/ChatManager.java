@@ -39,7 +39,7 @@ public class ChatManager implements Listener {
                   this.rewards.clear();
                }
             };
-            player.getScheduler().run(this.plugin, (task) -> runnable.run(), null);
+            Bukkit.getGlobalRegionScheduler().run(this.plugin, (task) -> runnable.run());
             int newPoints = this.plugin.gameManager.getPoints(player) + 1;
             this.plugin.gameManager.updateTop(player.getName(), this.plugin.gameManager.getPoints(player), newPoints);
             this.plugin.gameManager.setPoints(player, newPoints);
