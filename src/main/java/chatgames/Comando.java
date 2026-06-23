@@ -3,17 +3,97 @@ package chatgames;
 import Config.ConfigManager;
 import Config.YamlConfig;
 import Manager.GameManager;
-import org.bukkit.Bukkit;
-import org.bukkit.command.Command;
-import org.bukkit.command.CommandExecutor;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.builder.LiteralArgumentBuilder;
+import com.mojang.brigadier.tree.LiteralCommandNode;
+import io.papermc.paper.command.brigadier.CommandSourceStack;
+import io.papermc.paper.command.brigadier.Commands;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class Comando implements CommandExecutor {
+public class Comando {
    private final ChatGames plugin;
 
    public Comando(ChatGames instance) {
       this.plugin = instance;
+   }
+
+   public LiteralCommandNode<CommandSourceStack> register(Commands commands) {
+      YamlConfig messages = this.plugin.configManager.messages;
+
+      LiteralArgumentBuilder<CommandSourceStack> builder = Commands.literal("chatgames")
+         .requires(source -> source.getSender().hasPermission("chatgames.help") || source.getSender().hasPermission("chatgames.start.*"))
+         .executes(ctx -> {
+            CommandSender sender = ctx.getSource().getSender();
+            if (!sender.hasPermission("chatgames.help")) {
+               sender.sendMessage(ConfigManager.NOT_ENOUGH_PERMISSIONS);
+               return 1;
+            }
+            for (String msg : messages.getStringList("help_command")) {
+               sender.sendMessage(this.plugin.Color(msg));
+            }
+            return 1;
+         });
+
+      // top subcommand
+      builder.then(Commands.literal("top")
+         .requires(source -> source.getSender().hasPermission("chatgames.top"))
+         .executes(ctx -> {
+            this.plugin.gameManager.getTop(ctx.getSource().getSender());
+            return 1;
+         })
+      );
+
+      // toggle subcommand
+      builder.then(Commands.literal("toggle")
+         .requires(source -> source.getSender() instanceof Player && source.getSender().hasPermission("chatgames.toggle"))
+         .executes(ctx -> {
+            Player p = (Player) ctx.getSource().getSender();
+            String value;
+            if (!this.plugin.gameManager.gamesIsToggled(p)) {
+               this.plugin.gameManager.toggleGames(p, true);
+               value = "ON";
+            } else {
+               this.plugin.gameManager.toggleGames(p, false);
+               value = "OFF";
+            }
+            p.sendMessage(this.plugin.Color(messages.getString("toggle_game").replaceAll("%state%", value)));
+            return 1;
+         })
+      );
+
+      // reload subcommand
+      builder.then(Commands.literal("reload")
+         .requires(source -> source.getSender().hasPermission("chatgames.reload"))
+         .executes(ctx -> {
+            this.plugin.reloadFiles();
+            ctx.getSource().getSender().sendMessage(ConfigManager.CONFIG_RELOADED);
+            return 1;
+         })
+      );
+
+      // game argument subcommand (dynamic start)
+      builder.then(Commands.argument("game", StringArgumentType.word())
+         .suggests((ctx, suggestionsBuilder) -> {
+            String input = suggestionsBuilder.getRemaining().toLowerCase();
+            for (String game : this.plugin.games) {
+               if (ctx.getSource().getSender().hasPermission("chatgames.start." + game) || ctx.getSource().getSender().hasPermission("chatgames.start.*")) {
+                  if (game.toLowerCase().startsWith(input)) {
+                     suggestionsBuilder.suggest(game);
+                  }
+               }
+            }
+            return suggestionsBuilder.buildFuture();
+         })
+         .executes(ctx -> {
+            CommandSender sender = ctx.getSource().getSender();
+            String game = StringArgumentType.getString(ctx, "game");
+            this.startGameByCommand(sender, game);
+            return 1;
+         })
+      );
+
+      return builder.build();
    }
 
    public void startGameByCommand(CommandSender sender, String game) {
@@ -35,111 +115,9 @@ public class Comando implements CommandExecutor {
             sender.sendMessage(this.plugin.Color(messages.getString("game_started").replaceAll("%game%", this.plugin.selectedGame)));
             this.plugin.gameManager.startGame(GameManager.GameType.valueOf(game.toUpperCase()));
          }
+      } else {
+         sender.sendMessage(ConfigManager.UNKNOWN_COMMAND);
       }
-   }
-
-   public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-      if (cmd.getName().equalsIgnoreCase("chatgames")) {
-         YamlConfig messages = this.plugin.configManager.messages;
-         if (args.length == 0) {
-            if (!sender.hasPermission("chatgames.help")) {
-               sender.sendMessage(ConfigManager.NOT_ENOUGH_PERMISSIONS);
-               return true;
-            }
-
-            for (String msg : messages.getStringList("help_command")) {
-               sender.sendMessage(this.plugin.Color(msg));
-            }
-
-            return true;
-         }
-
-         if (args.length == 1) {
-            if (args[0].equalsIgnoreCase("top") && sender.hasPermission("chatgames.top")) {
-               this.plugin.gameManager.getTop(sender);
-               return true;
-            }
-
-            if (args[0].equalsIgnoreCase("unscramble")) {
-               this.startGameByCommand(sender, "unscramble");
-               return true;
-            }
-
-            if (args[0].equalsIgnoreCase("unreverse")) {
-               this.startGameByCommand(sender, "unreverse");
-               return true;
-            }
-
-            if (args[0].equalsIgnoreCase("reaction")) {
-               this.startGameByCommand(sender, "reaction");
-               return true;
-            }
-
-            if (args[0].equalsIgnoreCase("fillout")) {
-               this.startGameByCommand(sender, "fillout");
-               return true;
-            }
-
-            if (args[0].equalsIgnoreCase("random")) {
-               this.startGameByCommand(sender, "random");
-               return true;
-            }
-
-            if (args[0].equalsIgnoreCase("math")) {
-               this.startGameByCommand(sender, "math");
-               return true;
-            }
-
-            if (args[0].equalsIgnoreCase("variable")) {
-               this.startGameByCommand(sender, "variable");
-               return true;
-            }
-
-            if (args[0].equalsIgnoreCase("trivia")) {
-               this.startGameByCommand(sender, "trivia");
-               return true;
-            }
-
-            if (args[0].equalsIgnoreCase("toggle")) {
-               if (sender instanceof Player) {
-                  Player p = (Player)sender;
-                  if (p.hasPermission("chatgames.toggle")) {
-                     String value;
-                     if (!this.plugin.gameManager.gamesIsToggled(p)) {
-                        this.plugin.gameManager.toggleGames(p, true);
-                        value = "ON";
-                     } else {
-                        this.plugin.gameManager.toggleGames(p, false);
-                        value = "OFF";
-                     }
-
-                     sender.sendMessage(this.plugin.Color(messages.getString("toggle_game").replaceAll("%state%", value)));
-                     return true;
-                  }
-
-                  sender.sendMessage(ConfigManager.NOT_ENOUGH_PERMISSIONS);
-                  return true;
-               }
-
-               sender.sendMessage(ConfigManager.PLAYER_ONLY_COMMAND);
-               return true;
-            }
-
-            if (args[0].equalsIgnoreCase("reload")) {
-               if (sender.hasPermission("chatgames.reload")) {
-                  this.plugin.reloadFiles();
-                  sender.sendMessage(ConfigManager.CONFIG_RELOADED);
-                  return true;
-               }
-
-               sender.sendMessage(ConfigManager.NOT_ENOUGH_PERMISSIONS);
-               return true;
-            }
-         }
-      }
-
-      sender.sendMessage(ConfigManager.UNKNOWN_COMMAND);
-      return true;
    }
 
    public boolean startFromDisabledWorld(CommandSender sender) {

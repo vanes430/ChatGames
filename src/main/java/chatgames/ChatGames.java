@@ -17,6 +17,8 @@ import org.bukkit.ChatColor;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 import io.papermc.paper.threadedregions.scheduler.ScheduledTask;
+import io.papermc.paper.plugin.lifecycle.event.types.LifecycleEvents;
+import io.papermc.paper.command.brigadier.Commands;
 
 public class ChatGames extends JavaPlugin implements Listener {
    public static ChatGames instance;
@@ -48,7 +50,7 @@ public class ChatGames extends JavaPlugin implements Listener {
       this.getLogger().info("ChatGames is now enabled!");
       this.getServer().getPluginManager().registerEvents(new ChatManager(this), this);
       this.getServer().getPluginManager().registerEvents(this, this);
-      this.getCommand("chatgames").setExecutor(new Comando(this));
+      this.registerCommands();
       File config = new File(this.getDataFolder() + File.separator + "config.yml");
       if (!config.exists()) {
          this.saveDefaultConfig();
@@ -68,6 +70,15 @@ public class ChatGames extends JavaPlugin implements Listener {
 
    public void onDisable() {
       this.getLogger().info("ChatGames is now disabled!");
+   }
+
+   private void registerCommands() {
+      this.getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, event -> {
+         final Commands commands = event.registrar();
+         com.mojang.brigadier.tree.LiteralCommandNode<io.papermc.paper.command.brigadier.CommandSourceStack> cmdNode = 
+             new Comando(this).register(commands);
+         commands.register(cmdNode, "Starts an event/game", java.util.List.of("chatgame"));
+      });
    }
 
    public void loadGames() {
