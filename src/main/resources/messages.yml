@@ -22,7 +22,7 @@ help_command:
   - '&6'
   - '&6&lPERINTAH:'
   - '&6'
-  - '&a/chatgames (tipe) &f- &3Memulai jenis event yang ditentukan secara instan.'
+  - '&a/chatgames start (game) &f- &3Memulai jenis event yang ditentukan secara instan.'
   - '&a/chatgames top &f- &3Menampilkan 10 pemain teratas dengan poin terbanyak.'
   - '&a/chatgames toggle &f- &3Mengaktifkan atau menonaktifkan permainan.'
   - '&a/chatgames reload &f- &3Memuat ulang file config.yml.'

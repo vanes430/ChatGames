@@ -72,25 +72,29 @@ public class Comando {
          })
       );
 
-      // game argument subcommand (dynamic start)
-      builder.then(Commands.argument("game", StringArgumentType.word())
-         .suggests((ctx, suggestionsBuilder) -> {
-            String input = suggestionsBuilder.getRemaining().toLowerCase();
-            for (String game : this.plugin.games) {
-               if (ctx.getSource().getSender().hasPermission("chatgames.start." + game) || ctx.getSource().getSender().hasPermission("chatgames.start.*")) {
-                  if (game.toLowerCase().startsWith(input)) {
-                     suggestionsBuilder.suggest(game);
+      // start subcommand (dynamic start)
+      builder.then(Commands.literal("start")
+         .requires(source -> source.getSender().hasPermission("chatgames.start.*") || 
+                             this.plugin.games.stream().anyMatch(g -> source.getSender().hasPermission("chatgames.start." + g)))
+         .then(Commands.argument("game", StringArgumentType.word())
+            .suggests((ctx, suggestionsBuilder) -> {
+               String input = suggestionsBuilder.getRemaining().toLowerCase();
+               for (String game : this.plugin.games) {
+                  if (ctx.getSource().getSender().hasPermission("chatgames.start." + game) || ctx.getSource().getSender().hasPermission("chatgames.start.*")) {
+                     if (game.toLowerCase().startsWith(input)) {
+                        suggestionsBuilder.suggest(game);
+                     }
                   }
                }
-            }
-            return suggestionsBuilder.buildFuture();
-         })
-         .executes(ctx -> {
-            CommandSender sender = ctx.getSource().getSender();
-            String game = StringArgumentType.getString(ctx, "game");
-            this.startGameByCommand(sender, game);
-            return 1;
-         })
+               return suggestionsBuilder.buildFuture();
+            })
+            .executes(ctx -> {
+               CommandSender sender = ctx.getSource().getSender();
+               String game = StringArgumentType.getString(ctx, "game");
+               this.startGameByCommand(sender, game);
+               return 1;
+            })
+         )
       );
 
       return builder.build();
