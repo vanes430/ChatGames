@@ -35,7 +35,7 @@ unscramble:
     case-sensitive: true
     #__Leave the following 2 empty to disable them__
     titleMessage: '&b%word%'
-    subtitleMessage: '&aUnscramble'
+    subtitleMessage: '&aSusun Kata'
 
 unreverse:
     enable: true
@@ -43,7 +43,7 @@ unreverse:
     case-sensitive: true
     #Leave the following 2 empty to disable them
     titleMessage: '&b%word%'
-    subtitleMessage: '&aUnreverse'
+    subtitleMessage: '&aBalik Kata'
 
 reaction:
     enable: true
@@ -51,7 +51,7 @@ reaction:
     case-sensitive: true
     #__Leave the following 2 empty to disable them__
     titleMessage: '&b%word%'
-    subtitleMessage: '&aWrite'
+    subtitleMessage: '&aTulis Kata'
     
 fillout:
     enable: true
@@ -59,7 +59,7 @@ fillout:
     case-sensitive: true
     #__Leave the following 2 empty to disable them__
     titleMessage: '&b%word%'
-    subtitleMessage: '&aFill Out'
+    subtitleMessage: '&aLengkapi Kata'
 
 #In this game, a string of the length specified will be created with random characters
 random:
@@ -73,7 +73,7 @@ random:
     
     #__Leave the following 2 empty to disable them__
     titleMessage: '&b%random%'
-    subtitleMessage: '&aWrite'
+    subtitleMessage: '&aTulis Karakter'
 
 math:
     enable: true
@@ -96,7 +96,7 @@ math:
       
     #__Leave the following 2 empty to disable them__
     titleMessage: '&b%equation%'
-    subtitleMessage: '&aSolve'
+    subtitleMessage: '&aSelesaikan'
     
 variable:
     enable: true
@@ -106,7 +106,7 @@ variable:
     
     #__Leave the following 2 empty to disable them__
     titleMessage: '&bSOLVE'
-    subtitleMessage: '&aFor &7`&b%symbol%&7`'
+    subtitleMessage: '&aCari &7`&b%symbol%&7`'
     
     #The range of the random result number
     result-min: 20
@@ -126,12 +126,21 @@ trivia:
     case-sensitive: false
     #__Leave the following 2 empty to disable them__
     titleMessage: '&bTRIVIA'
-    subtitleMessage: '&aCheck Chat!'
+    subtitleMessage: '&aLihat Chat!'
     
     data:
       1:
-        question: 'How many sides does a dice have? (number)'
+        question: 'Berapa jumlah sisi pada dadu? (angka)'
         answer: '6'
       2:
-        question: 'In what planet do we live in?'
-        answer: 'Earth'
+        question: 'Di planet apa kita tinggal?'
+        answer: 'Bumi'
+      3:
+        question: 'Apa nama dimensi neraka di Minecraft?'
+        answer: 'Nether'
+      4:
+        question: 'Bahan apa yang digunakan untuk menjinakkan serigala?'
+        answer: 'Tulang'
+      5:
+        question: 'Berapa banyak bongkahan besi (Iron Nugget) untuk membuat satu Batang Besi (Iron Ingot)? (angka)'
+        answer: '9'
